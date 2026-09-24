@@ -1,4 +1,5 @@
 from urllib.parse import urlsplit
+from bs4 import BeautifulSoup, Tag
 
 def normalize_url(input_url: str) -> str:
     parsed_url = urlsplit(input_url)
@@ -6,3 +7,18 @@ def normalize_url(input_url: str) -> str:
     full_path = full_path.rstrip("/")
     return full_path.lower()
 
+def get_heading_from_html(input_body: str) -> str:
+    soup = BeautifulSoup(input_body, 'html.parser')
+    h_tag = soup.find("h1") or soup.find("h2")
+    return h_tag.get_text(strip=True) if isinstance(h_tag, Tag) else "" 
+
+def get_first_paragraph_from_html(input_body: str) -> str:
+    soup = BeautifulSoup(input_body, 'html.parser')
+
+    main_section = soup.find("main")
+    if isinstance(main_section, Tag):
+        first_p = main_section.find("p")
+    else:
+        first_p = soup.find("p")
+        
+    return first_p.get_text(strip=True) if isinstance(first_p, Tag) else "" 
