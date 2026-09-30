@@ -100,3 +100,38 @@ def get_html(url: str) -> str:
         raise Exception(f"got non-HTML response: {content_type}")
 
     return response.text
+
+
+def crawl_page(base_url, current_url=None, page_data=None):
+    # 1. Handle default arguments
+    if current_url is None:
+        current_url = base_url
+
+    if page_data is None:
+        page_data = {}
+
+    # 2. Same-domain check
+    if urlsplit(base_url).netloc != urlsplit(current_url).netloc:
+        return page_data
+
+    # 3. Normalize and check for duplicates
+    parsed_current_url = normalize_url(current_url)
+    if parsed_current_url in page_data:
+        return page_data
+
+    # 4. Fetch the HTML
+    try:
+        current_html = get_html(current_url)
+        print(f"Crawling: {current_url}")
+    except Exception as e:
+        print(f"Error fetching HTML from {current_url}: {str(e)}")
+        return page_data
+
+    # 5. Extract and Store the Data
+    page_data[parsed_current_url] = extract_page_data(current_html, current_url)
+
+    # 6. Recursion
+    outgoing_links = page_data[parsed_current_url]["outgoing_links"]
+    for link in outgoing_links:
+        page_data = crawl_page(base_url, link, page_data)
+    return page_data
