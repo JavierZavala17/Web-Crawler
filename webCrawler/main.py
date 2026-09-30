@@ -17,7 +17,8 @@ def main() -> None:
     print(f"starting crawl of: {base_url}...")
 
     page_data = crawl_page(base_url)
-    print(f"Found: {len(page_data)} pages:")
+
+    print(f"Found {len(page_data)} pages:")
     for page in page_data.values():
         print(f"- {page['url']}: {len(page['outgoing_links'])} outgoing links")
 
